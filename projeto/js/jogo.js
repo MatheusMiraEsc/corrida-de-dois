@@ -17,7 +17,7 @@ class Jogo {
         this.estado = "emAndamento"; // ou "finalizado"
     }
 
-    /**
+    /**z
      * @returns {Jogador} o jogador da vez
      */
     obterJogadorAtual() {
@@ -84,8 +84,8 @@ class Jogo {
      * Restaura o jogo para uma nova partida, preservando os nomes
      * e pontuações acumuladas dos jogadores.
      */
-    reiniciarPartida() {
-        this.jogadores.forEach((jogador) => jogador.reiniciar());
+    revanchePartida() {
+        this.jogadores.forEach((jogador) => jogador.revanche());
         this.indiceJogadorAtual = 0;
         this.estado = "emAndamento";
     }

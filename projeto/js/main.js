@@ -47,7 +47,8 @@ const carrinhos = [carrinho1, carrinho2];
 
 const botaoRolar = document.getElementById("botao-rolar");
 const resultadoDado = document.getElementById("resultado-dado");
-const botaoReiniciar = document.getElementById("botao-reiniciar");
+const botaoRevanche = document.getElementById("botao-revanche");
+const botaoReinicio = document.getElementById("botao-reinicio");
 const areaFinal = document.getElementById("area-final");
 const mensagemFinal = document.getElementById("mensagem-final");
 
@@ -176,8 +177,8 @@ function finalizarPartida(vencedor) {
  * Reinicia a partida: zera posições, esconde a mensagem final,
  * reabilita o botão de rolar dado e retorna os carrinhos ao início.
  */
-function tratarReinicio() {
-    jogo.reiniciarPartida();
+function tratarRevanche() {
+    jogo.revanchePartida();
     carrinho1.reiniciar();
     carrinho2.reiniciar();
 
@@ -193,10 +194,13 @@ function tratarReinicio() {
         `Vez de: ${jogo.obterJogadorAtual().nome}`;
     atualizarDestaqueTurno();
 }
+function tratarReinicio() {
+    window.location.href = "index.html";
+}
 
 botaoRolar.addEventListener("click", tratarRolagemDeDado);
-botaoReiniciar.addEventListener("click", tratarReinicio);
-
+botaoRevanche.addEventListener("click", tratarRevanche);
+botaoReinicio.addEventListener("click", tratarReinicio);
 // Como moverPara() calcula a distância com base na largura atual da pista,
 // redimensionar a janela pode desalinhar visualmente os carrinhos em
 // relação à posição lógica. Recalculamos a posição visual ao redimensionar.

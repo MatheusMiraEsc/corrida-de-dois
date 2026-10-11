@@ -39,7 +39,7 @@ class Jogador {
      * Restaura o jogador ao estado inicial, preservando nome e id.
      * Útil para o botão "Jogar novamente".
      */
-    reiniciar() {
+    revanche() {
         this.posicao = 0;
         this.numeroDeJogadas = 0;
     }
