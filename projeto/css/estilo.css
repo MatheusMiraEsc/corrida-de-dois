@@ -58,7 +58,6 @@ h1, h2 {
     color: var(--cor-texto-suave);
 }
 
-.regras,
 .formulario-jogadores {
     background-color: var(--cor-painel);
     border-radius: var(--raio-borda);
@@ -66,7 +65,6 @@ h1, h2 {
     padding: 20px;
 }
 
-.regras h2,
 .formulario-jogadores h2 {
     margin-bottom: 12px;
     font-size: 1.2rem;
@@ -132,6 +130,37 @@ h1, h2 {
 
 .botao-principal:active {
     transform: translateY(0);
+}
+
+/* Botão desabilitado (ex.: enquanto o dado gira ou após a vitória):
+   fica mais apagado e não "pula" ao passar o mouse. */
+.botao-principal:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Botão "Clique aqui para ver as regras" — versão "contornada" do
+   botão principal, para não competir com os botões de ação. */
+.botao-regras {
+    background-color: transparent;
+    color: var(--cor-destaque);
+    border: 2px solid var(--cor-destaque);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.botao-regras:hover {
+    background-color: var(--cor-destaque);
+    color: #1b1f2a;
+}
+
+.cabecalho-jogo .botao-regras {
+    margin-top: 10px;
 }
 
 /* =========================================
@@ -242,12 +271,16 @@ h1, h2 {
     animation: destaque-movimento 0.3s ease-in-out 2;
 }
 
+/* Os dois carrinhos usam o mesmo ícone; a cor de cada jogador
+   (as mesmas do placar) é o que diferencia um do outro. */
 .carrinho-jogador1 {
     top: 8px;
+    color: var(--cor-jogador1);
 }
 
 .carrinho-jogador2 {
     bottom: 8px;
+    color: var(--cor-jogador2);
 }
 
 .linha-chegada {
@@ -274,6 +307,48 @@ h1, h2 {
 .area-dado .botao-principal {
     width: auto;
     padding: 14px 32px;
+}
+
+/* O dado: um quadrado branco com cantos arredondados e o número no meio. */
+.dado {
+    width: 64px;
+    height: 64px;
+    background-color: #ffffff;
+    color: #1b1f2a;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 800;
+    box-shadow: var(--sombra), inset 0 -4px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* Animação de giro do dado (1,2 s).
+   rotate() gira o dado; translateY() o faz "pular" e quicar,
+   como se tivesse sido jogado na mesa. */
+@keyframes girar-dado {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+    30% {
+        transform: translateY(-30px) rotate(400deg);
+    }
+    60% {
+        transform: translateY(0) rotate(720deg);
+    }
+    80% {
+        transform: translateY(-8px) rotate(900deg);
+    }
+    100% {
+        transform: translateY(0) rotate(1080deg);
+    }
+}
+
+/* O JS adiciona a classe "girando" para começar a animação e a remove
+   quando ela termina (evento "animationend" em main.js). */
+.dado.girando {
+    animation: girar-dado 1.2s ease-out;
 }
 
 /* --- Lista e tabela --- */
@@ -333,11 +408,50 @@ tbody td {
     border-bottom: 1px solid var(--cor-fundo);
 }
 
-/* --- Área final --- */
-.area-final {
+/* --- Modais (vitória e regras) --- */
+
+/* Fundo escuro que cobre a tela inteira.
+   position: fixed + inset: 0 = ocupa a janela toda, mesmo com rolagem.
+   rgba(0, 0, 0, 0.75) = preto com 75% de opacidade (escurece o jogo atrás).
+   Fica ANTES de .oculto neste arquivo de propósito: assim, quando o
+   elemento também tem a classe .oculto, o display: none vence. */
+.fundo-escuro {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    z-index: 100;
+    animation: aparecer 0.3s ease;
+}
+
+/* Caixa centralizada sobre o fundo escuro. */
+.caixa-modal {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
     background-color: var(--cor-painel);
     border-radius: var(--raio-borda);
-    padding: 20px;
+    border-top: 4px solid var(--cor-destaque);
+    box-shadow: var(--sombra);
+    padding: 28px 24px;
+    animation: surgir 0.35s ease;
+}
+
+@keyframes aparecer {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes surgir {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Conteúdo da caixa de vitória */
+.caixa-vitoria {
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -345,15 +459,54 @@ tbody td {
     align-items: center;
 }
 
+.icone-vitoria {
+    font-size: 4rem;
+    color: var(--cor-destaque);
+    animation: pular 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes pular {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+}
+
+.titulo-vitoria {
+    font-size: 1.1rem;
+    color: var(--cor-texto-suave);
+}
+
 .mensagem-final {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--cor-destaque);
 }
 
-.area-final .botao-principal {
+.caixa-vitoria .botao-principal {
     width: auto;
     padding: 12px 28px;
+}
+
+/* Conteúdo da caixa de regras */
+.caixa-regras h2 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+}
+
+/* Botão de fechar (ícone "X") no canto superior direito da caixa */
+.botao-fechar {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--cor-texto-suave);
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.botao-fechar:hover {
+    color: var(--cor-destaque);
 }
 
 /* Classe utilitária de ocultação — controlada via JS (classList) */
@@ -375,5 +528,11 @@ tbody td {
 
     .carrinho {
         font-size: 1.5rem;
+    }
+
+    .dado {
+        width: 56px;
+        height: 56px;
+        font-size: 1.7rem;
     }
 }

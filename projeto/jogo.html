@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corrida dos Dois - Jogo</title>
+    <!-- Font Awesome (ícones). Carregado pela internet (CDN). -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
@@ -11,8 +13,11 @@
     <main class="container-jogo">
 
         <header class="cabecalho-jogo">
-            <h1>🏁 Corrida dos Dois</h1>
+            <h1><i class="fa-solid fa-flag-checkered" aria-hidden="true"></i> Corrida dos Dois</h1>
             <p id="vez-atual" class="indicador-vez">Vez de: —</p>
+            <button type="button" id="botao-abrir-regras" class="botao-regras">
+                Clique aqui para ver as regras
+            </button>
         </header>
 
         <section class="placar" aria-label="Placar dos jogadores">
@@ -29,16 +34,19 @@
 
         <section class="area-pista" aria-label="Pista de corrida">
             <div class="pista" id="pista">
-                <div class="carrinho carrinho-jogador1" id="carrinho1">🏎️</div>
-                <div class="carrinho carrinho-jogador2" id="carrinho2">🚗</div>
-                <div class="linha-chegada" id="linha-chegada">🏁</div>
+                <div class="carrinho carrinho-jogador1" id="carrinho1"><i class="fa-solid fa-car-side" aria-hidden="true"></i></div>
+                <div class="carrinho carrinho-jogador2" id="carrinho2"><i class="fa-solid fa-car-side" aria-hidden="true"></i></div>
+                <div class="linha-chegada" id="linha-chegada"><i class="fa-solid fa-flag-checkered" aria-hidden="true"></i></div>
             </div>
         </section>
 
         <section class="area-dado" aria-label="Controle do dado">
+            <!-- Representação visual do dado. A classe "girando" é
+                 adicionada pelo JS para disparar a animação do CSS. -->
+            <div class="dado" id="dado">?</div>
             <p class="resultado-dado" id="resultado-dado">Resultado: —</p>
             <button type="button" id="botao-rolar" class="botao-principal">
-                🎲 Rolar dado
+                <i class="fa-solid fa-dice" aria-hidden="true"></i> Rolar dado
             </button>
         </section>
 
@@ -64,18 +72,42 @@
             </div>
         </section>
 
-        <section class="area-final oculto" id="area-final">
-            <p class="mensagem-final" id="mensagem-final"></p>
-            <button type="button" id="botao-reiniciar" class="botao-principal">
-                Jogar novamente
-            </button>
-        </section>
+        <!-- Destaque do vencedor: um fundo escuro que cobre a tela inteira
+             com uma caixa centralizada. Começa escondido (classe "oculto")
+             e aparece pela função finalizarPartida() em main.js. -->
+        <div class="fundo-escuro oculto" id="area-final">
+            <section class="caixa-modal caixa-vitoria" role="dialog" aria-modal="true" aria-labelledby="titulo-vitoria">
+                <p class="icone-vitoria"><i class="fa-solid fa-trophy" aria-hidden="true"></i></p>
+                <h2 class="titulo-vitoria" id="titulo-vitoria">Temos um vencedor!</h2>
+                <p class="mensagem-final" id="mensagem-final"></p>
+                <button type="button" id="botao-reiniciar" class="botao-principal">
+                    <i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Jogar novamente
+                </button>
+            </section>
+        </div>
 
     </main>
+
+    <!-- Janela (modal) com as regras do jogo.
+         Começa escondida (classe "oculto") e é aberta pelo botão
+         "Clique aqui para ver as regras" (ver js/modal-regras.js). -->
+    <div class="fundo-escuro oculto" id="modal-regras">
+        <section class="caixa-modal caixa-regras" role="dialog" aria-modal="true" aria-labelledby="titulo-regras">
+            <button type="button" class="botao-fechar" id="botao-fechar-regras" aria-label="Fechar regras"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            <h2 id="titulo-regras">Como jogar</h2>
+            <ul class="lista-regras">
+                <li>Cada jogador controla um carrinho na pista.</li>
+                <li>Os jogadores se revezam rolando um dado.</li>
+                <li>O carrinho avança o número de casas indicado pelo dado.</li>
+                <li>O primeiro carrinho a cruzar a linha de chegada vence!</li>
+            </ul>
+        </section>
+    </div>
 
     <script src="js/jogador.js"></script>
     <script src="js/carrinho.js"></script>
     <script src="js/jogo.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/modal-regras.js"></script>
 </body>
 </html>

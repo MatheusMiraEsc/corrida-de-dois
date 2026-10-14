@@ -47,6 +47,7 @@ const carrinhos = [carrinho1, carrinho2];
 
 const botaoRolar = document.getElementById("botao-rolar");
 const resultadoDado = document.getElementById("resultado-dado");
+const elementoDado = document.getElementById("dado");
 const botaoReiniciar = document.getElementById("botao-reiniciar");
 const areaFinal = document.getElementById("area-final");
 const mensagemFinal = document.getElementById("mensagem-final");
@@ -130,15 +131,53 @@ function atualizarPlacar() {
 }
 
 /**
- * Trata o clique no botão "Rolar dado": sorteia o valor, move o jogador
- * da vez (lógica e visualmente), verifica se houve vencedor e, se não
- * houve, passa a vez para o outro jogador.
+ * Trata o clique no botão "Rolar dado".
+ * 1. Sorteia o valor do dado UMA única vez (antes da animação).
+ * 2. Desabilita o botão, para impedir cliques repetidos.
+ * 3. Liga a animação de giro do dado (classe "girando" no CSS).
+ * 4. Quando a animação termina (evento "animationend"), mostra o valor
+ *    sorteado e chama aplicarJogada() com esse MESMO valor.
  */
 function tratarRolagemDeDado() {
+    const valorDado = jogo.rolarDado();
+
+    botaoRolar.disabled = true;
+    resultadoDado.textContent = "Rolando...";
+    elementoDado.classList.add("girando");
+
+    // Enquanto o dado gira, trocamos o número exibido a cada 100 ms
+    // só para dar a sensação de um dado de verdade rolando.
+    // Esses números são apenas decorativos: o valor que vale para a
+    // jogada já foi sorteado acima e está guardado em "valorDado".
+    const intervaloDeFaces = setInterval(() => {
+        elementoDado.textContent = Math.floor(Math.random() * 6) + 1;
+    }, 100);
+
+    // "animationend" é disparado pelo navegador quando a animação CSS
+    // termina. { once: true } faz este código rodar só uma vez por clique.
+    elementoDado.addEventListener(
+        "animationend",
+        () => {
+            clearInterval(intervaloDeFaces);
+            elementoDado.classList.remove("girando");
+            elementoDado.textContent = valorDado;
+            aplicarJogada(valorDado);
+        },
+        { once: true }
+    );
+}
+
+/**
+ * Aplica o resultado do dado: move o jogador da vez (lógica e
+ * visualmente), verifica se houve vencedor e, se não houve, passa a
+ * vez para o outro jogador e libera o botão de rolar novamente.
+ * (É a mesma lógica que antes ficava em tratarRolagemDeDado.)
+ * @param {number} valorDado - valor sorteado em tratarRolagemDeDado()
+ */
+function aplicarJogada(valorDado) {
     const jogadorDaVez = jogo.obterJogadorAtual();
     const carrinhoDaVez = obterCarrinhoAtual();
 
-    const valorDado = jogo.rolarDado();
     resultadoDado.textContent = `Resultado: ${valorDado}`;
     registrarEvento(`${jogadorDaVez.nome} rolou o dado e tirou ${valorDado}.`);
 
@@ -158,18 +197,27 @@ function tratarRolagemDeDado() {
             `Vez de: ${jogo.obterJogadorAtual().nome}`;
         registrarEvento(`Agora é a vez de ${jogo.obterJogadorAtual().nome}.`);
         atualizarDestaqueTurno();
+        botaoRolar.disabled = false; // libera a próxima jogada
     }
 }
 
 /**
- * Exibe a mensagem de vitória e desabilita o botão de rolar dado.
+ * Exibe o destaque de vitória (fundo escuro + caixa com o nome do
+ * vencedor) e mantém o botão de rolar dado desabilitado.
+ * Só é chamada quando jogo.verificarVencedor() devolve um jogador.
  * @param {Jogador} vencedor
  */
 function finalizarPartida(vencedor) {
-    mensagemFinal.textContent = `🏆 ${vencedor.nome} venceu a corrida!`;
-    registrarEvento(`${vencedor.nome} venceu a corrida! 🏆`);
-    areaFinal.classList.remove("oculto");
+    mensagemFinal.textContent = `${vencedor.nome} venceu a corrida!`;
+    registrarEvento(`${vencedor.nome} venceu a corrida!`);
     botaoRolar.disabled = true;
+
+    // Esperamos 700 ms (o carrinho leva 0,6 s para andar, ver .carrinho
+    // no CSS) para o jogador ver o carrinho cruzar a linha de chegada
+    // antes de o fundo escurecer.
+    setTimeout(() => {
+        areaFinal.classList.remove("oculto");
+    }, 700);
 }
 
 /**
@@ -183,6 +231,7 @@ function tratarReinicio() {
 
     atualizarPlacar();
     resultadoDado.textContent = "Resultado: —";
+    elementoDado.textContent = "?";
     areaFinal.classList.add("oculto");
     botaoRolar.disabled = false;
 

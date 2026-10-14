@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corrida dos Dois - Configuração</title>
+    <!-- Font Awesome (ícones). Carregado pela internet (CDN). -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
@@ -11,19 +13,13 @@
     <main class="container-configuracao">
 
         <header class="cabecalho">
-            <h1>🏁 Corrida dos Dois</h1>
+            <h1><i class="fa-solid fa-flag-checkered" aria-hidden="true"></i> Corrida dos Dois</h1>
             <p class="subtitulo">Um jogo de corrida por turnos para dois jogadores</p>
         </header>
 
-        <section class="regras" aria-labelledby="titulo-regras">
-            <h2 id="titulo-regras">Como jogar</h2>
-            <ul class="lista-regras">
-                <li>Cada jogador controla um carrinho na pista.</li>
-                <li>Os jogadores se revezam rolando um dado.</li>
-                <li>O carrinho avança o número de casas indicado pelo dado.</li>
-                <li>O primeiro carrinho a cruzar a linha de chegada vence!</li>
-            </ul>
-        </section>
+        <button type="button" id="botao-abrir-regras" class="botao-regras">
+            <i class="fa-solid fa-book-open" aria-hidden="true"></i> Clique aqui para ver as regras
+        </button>
 
         <section class="formulario-jogadores" aria-labelledby="titulo-formulario">
             <h2 id="titulo-formulario">Quem vai jogar?</h2>
@@ -54,13 +50,30 @@
                 </div>
 
                 <button type="submit" id="botao-iniciar" class="botao-principal">
-                    Iniciar jogo
+                    <i class="fa-solid fa-play" aria-hidden="true"></i> Iniciar jogo
                 </button>
             </form>
         </section>
 
     </main>
 
+    <!-- Janela (modal) com as regras do jogo.
+         Começa escondida (classe "oculto") e é aberta pelo botão
+         "Clique aqui para ver as regras" (ver js/modal-regras.js). -->
+    <div class="fundo-escuro oculto" id="modal-regras">
+        <section class="caixa-modal caixa-regras" role="dialog" aria-modal="true" aria-labelledby="titulo-regras">
+            <button type="button" class="botao-fechar" id="botao-fechar-regras" aria-label="Fechar regras"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            <h2 id="titulo-regras">Como jogar</h2>
+            <ul class="lista-regras">
+                <li>Cada jogador controla um carrinho na pista.</li>
+                <li>Os jogadores se revezam rolando um dado.</li>
+                <li>O carrinho avança o número de casas indicado pelo dado.</li>
+                <li>O primeiro carrinho a cruzar a linha de chegada vence!</li>
+            </ul>
+        </section>
+    </div>
+
+    <script src="js/modal-regras.js"></script>
     <script src="js/configuracao.js"></script>
 </body>
 </html>
