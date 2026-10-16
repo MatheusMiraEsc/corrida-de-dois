@@ -105,6 +105,44 @@ h1, h2 {
     border-color: var(--cor-destaque);
 }
 
+.selecao-veiculos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.opcao-veiculo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 58px;
+    background-color: var(--cor-fundo);
+    color: var(--cor-destaque);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.opcao-veiculo i {
+    font-size: 1.8rem;
+}
+
+.opcao-veiculo:hover {
+    background-color: #333a4d;
+}
+
+.opcao-veiculo.selecionado {
+    border-color: var(--cor-destaque);
+    background-color: #333a4d;
+}
+
+.opcao-veiculo:focus-visible {
+    outline: 2px solid var(--cor-destaque);
+    outline-offset: 3px;
+}
+
 .mensagem-erro {
     color: var(--cor-erro);
     font-size: 0.85rem;

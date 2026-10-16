@@ -11,7 +11,32 @@ const TOTAL_DE_CASAS = 20;
 const parametros = new URLSearchParams(window.location.search);
 const nomeJogador1 = parametros.get("jogador1");
 const nomeJogador2 = parametros.get("jogador2");
+const iconeJogador1 = parametros.get("veiculo1") || "fa-car-side";
+const iconeJogador2 = parametros.get("veiculo2") || "fa-car-side";
 
+// Lista de ícones permitidos.
+const iconesPermitidos = new Set([
+    "fa-car-side",
+    "fa-car",
+    "fa-taxi",
+    "fa-truck-pickup",
+    "fa-motorcycle",
+    "fa-bicycle"
+]);
+
+function configurarVeiculo(elemento, icone) {
+    const iconeValido = iconesPermitidos.has(icone)
+        ? icone
+        : "fa-car-side";
+
+    elemento.replaceChildren();
+
+    const elementoIcone = document.createElement("i");
+    elementoIcone.classList.add("fa-solid", iconeValido);
+    elementoIcone.setAttribute("aria-hidden", "true");
+
+    elemento.appendChild(elementoIcone);
+}
 // Se a página foi aberta sem os parâmetros esperados (por exemplo,
 // digitando a URL diretamente), voltamos para a configuração.
 if (!nomeJogador1 || !nomeJogador2) {
@@ -25,6 +50,8 @@ const jogador2 = new Jogador(nomeJogador2, 2);
 // --- Criação dos carrinhos (elementos visuais) ---
 const elementoCarrinho1 = document.getElementById("carrinho1");
 const elementoCarrinho2 = document.getElementById("carrinho2");
+configurarVeiculo(elementoCarrinho1, iconeJogador1);
+configurarVeiculo(elementoCarrinho2, iconeJogador2);
 
 const carrinho1 = new Carrinho(elementoCarrinho1, TOTAL_DE_CASAS);
 const carrinho2 = new Carrinho(elementoCarrinho2, TOTAL_DE_CASAS);
