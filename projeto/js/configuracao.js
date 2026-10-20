@@ -10,6 +10,7 @@ const inputJogador2 = document.getElementById("input-jogador2");
 const erroJogador1 = document.getElementById("erro-jogador1");
 const erroJogador2 = document.getElementById("erro-jogador2");
 
+
 formulario.addEventListener("submit", (evento) => {
     evento.preventDefault();
 
@@ -21,6 +22,36 @@ formulario.addEventListener("submit", (evento) => {
     if (nomesValidos) {
         redirecionarParaJogo(nomeJogador1, nomeJogador2);
     }
+});
+
+
+// Veículos selecionados por cada jogador.
+const veiculosSelecionados = {
+    1: "fa-car-side",
+    2: "fa-car-side"
+};
+
+// Permite selecionar um veículo para cada jogador.
+document.querySelectorAll(".selecao-veiculos").forEach((selecao) => {
+    const numeroJogador = selecao.dataset.jogador;
+
+    selecao.addEventListener("click", (evento) => {
+        const botao = evento.target.closest(".opcao-veiculo");
+
+        if (!botao || !selecao.contains(botao)) {
+            return;
+        }
+
+        veiculosSelecionados[numeroJogador] = botao.dataset.icone;
+
+        // Atualiza o destaque visual da seleção.
+        selecao.querySelectorAll(".opcao-veiculo").forEach((opcao) => {
+            const selecionado = opcao === botao;
+
+            opcao.classList.toggle("selecionado", selecionado);
+            opcao.setAttribute("aria-pressed", String(selecionado));
+        });
+    });
 });
 
 /**
@@ -60,6 +91,8 @@ function redirecionarParaJogo(nome1, nome2) {
     const parametros = new URLSearchParams({
         jogador1: nome1,
         jogador2: nome2,
+        veiculo1: veiculosSelecionados[1],
+        veiculo2: veiculosSelecionados[2]
     });
 
     window.location.href = `jogo.html?${parametros.toString()}`;

@@ -32,6 +32,7 @@ projeto/
     ├── carrinho.js        # Classe Carrinho — elemento visual e animação
     ├── jogo.js            # Classe Jogo — turnos, dado e condição de vitória
     ├── configuracao.js    # Lógica da página inicial (validação e redirecionamento)
+    ├── modal-regras.js    # Abre/fecha a janela de regras (usado nas duas páginas)
     └── main.js            # Ponto de entrada da página do jogo (liga tudo)
 ```
 
