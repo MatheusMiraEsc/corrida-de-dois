@@ -24,7 +24,17 @@ export class SocketRequestError extends Error {
   }
 }
 
-type MessageListener = (message: ServerMessage<any>) => void;
+/**
+ * Id aleatório para correlacionar pedido e resposta. Não usa crypto.randomUUID()
+ * porque ele só existe em "contexto seguro" (https ou localhost): abrindo o jogo
+ * pelo IP da rede local (http://192.168.x.x) ele não está disponível.
+ */
+export function createRequestId(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+type MessageListener =(message: ServerMessage<any>) => void;
 type StatusListener = (status: ConnectionStatus) => void;
 
 interface Pending {
@@ -82,7 +92,7 @@ export class GameSocket {
         new SocketRequestError({ code: "NOT_CONNECTED", message: "Sem conexão com o servidor. Tentando reconectar…" }),
       );
     }
-    const requestId = crypto.randomUUID();
+    const requestId = createRequestId();
     return new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => {
         this.pending.delete(requestId);
