@@ -13,11 +13,14 @@ import { readFileSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
 
 const BACKEND_URL = process.env.E2E_BACKEND_URL ?? "http://localhost:3101";
-const FRONTEND_URL = "http://localhost:5174";
+/** Com E2E_FRONTEND_URL, testa um ambiente já no ar (docker/deploy) e não sobe servidores. */
+const EXTERNAL_FRONTEND = process.env.E2E_FRONTEND_URL;
+const FRONTEND_URL = EXTERNAL_FRONTEND ?? "http://localhost:5174";
 const BACKEND = process.env.E2E_BACKEND ?? "node";
 
 function testDatabaseUrl(): string {
   if (process.env.TEST_DATABASE_URL) return process.env.TEST_DATABASE_URL;
+  if (process.env.E2E_FRONTEND_URL) return ""; // ambiente externo: não sobe backend
   try {
     const env = readFileSync("../backend-node/.env", "utf8");
     const match = /^TEST_DATABASE_URL=(.+)$/m.exec(env);
@@ -56,7 +59,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  webServer: [
+  webServer: EXTERNAL_FRONTEND ? [] : [
     // Para testar outro backend já rodando, defina E2E_BACKEND=external e E2E_BACKEND_URL.
     ...(BACKEND === "external" ? [] : [backendServer]),
     {

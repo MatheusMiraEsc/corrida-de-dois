@@ -1,0 +1,39 @@
+# ---------------------------------------------------------------------------
+# Blueprint do Render (https://render.com/docs/blueprint-spec) — PREPARADO,
+# AINDA NÃO PUBLICADO. Veja docs/deploy.md para o passo a passo.
+#
+# Banco: PostgreSQL externo e persistente (ex.: Neon, plano gratuito).
+# O PostgreSQL gratuito do Render expira em 30 dias e NÃO serve para o ranking.
+# Valores marcados com "sync: false" são pedidos no painel ao criar o Blueprint.
+# ---------------------------------------------------------------------------
+services:
+  - type: web
+    name: corrida-backend-node
+    runtime: docker
+    dockerContext: ./backend-node
+    dockerfilePath: ./backend-node/Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL # URL do Neon (com ?sslmode=require)
+        sync: false
+      - key: CORS_ORIGINS # URL pública do frontend, ex.: https://corrida-frontend.onrender.com
+        sync: false
+      - key: RECONNECT_GRACE_SECONDS
+        value: "60"
+      - key: ENABLE_TEST_ENDPOINTS
+        value: "false"
+
+  - type: web
+    name: corrida-frontend
+    runtime: docker
+    dockerContext: ./frontend
+    dockerfilePath: ./frontend/Dockerfile
+    plan: free
+    envVars:
+      - key: API_URL # ex.: https://corrida-backend-node.onrender.com
+        sync: false
+      - key: WS_URL # ex.: wss://corrida-backend-node.onrender.com/ws
+        sync: false

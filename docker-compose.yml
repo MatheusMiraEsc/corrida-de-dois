@@ -1,3 +1,13 @@
+# ---------------------------------------------------------------------------
+# Corrida dos Dois — ambiente completo
+#
+#   docker compose up --build          → banco + migrations + backend Node + frontend
+#   http://localhost:8081              → jogo
+#   http://localhost:3000/api/health   → backend
+#
+# Configuração no arquivo .env (copie de .env.example).
+# O backend Java ainda não está no compose (em desenvolvimento).
+# ---------------------------------------------------------------------------
 services:
   postgres:
     image: postgres:17-alpine
@@ -6,6 +16,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
       POSTGRES_DB: ${POSTGRES_DB:-corrida_dos_dois}
     ports:
+      # Exposto só para desenvolvimento/testes locais (npm run dev, test:db).
       - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -15,6 +26,50 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+    restart: unless-stopped
+
+  # Cria/atualiza as tabelas (migrations do Prisma) e termina.
+  migrate:
+    build:
+      context: ./backend-node
+      target: migrate
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-corrida_dos_dois}?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  backend-node:
+    build:
+      context: ./backend-node
+      target: runtime
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-corrida_dos_dois}?schema=public
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8081}
+      RECONNECT_GRACE_SECONDS: ${RECONNECT_GRACE_SECONDS:-60}
+      ENABLE_TEST_ENDPOINTS: "false"
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "${BACKEND_NODE_PORT:-3000}:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    environment:
+      # URLs que o NAVEGADOR usa para falar com o backend (trocar aqui para usar outro backend).
+      API_URL: ${FRONTEND_API_URL:-http://localhost:3000}
+      WS_URL: ${FRONTEND_WS_URL:-ws://localhost:3000/ws}
+    ports:
+      - "${FRONTEND_PORT:-8081}:80"
+    depends_on:
+      backend-node:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   postgres-data:
