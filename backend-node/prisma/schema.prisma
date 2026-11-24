@@ -1,0 +1,59 @@
+// Modelo de dados oficial do Corrida dos Dois.
+// As migrations geradas a partir deste arquivo (prisma/migrations) são a
+// fonte da verdade do banco e também são usadas pelo backend Java, que
+// apenas VALIDA o schema (não o altera).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Jogador identificado por UUID + token secreto (só o hash é salvo).
+model Player {
+  id        String       @id @db.Uuid
+  name      String       @db.VarChar(24)
+  tokenHash String       @unique @map("token_hash") @db.Char(64)
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  games     GamePlayer[]
+  wins      Game[]       @relation("GameWinner")
+
+  @@map("players")
+}
+
+/// Partida encerrada (FINISHED = alguém chegou à casa 100; ABANDONED = alguém saiu).
+model Game {
+  id              String       @id @db.Uuid
+  roomCode        String       @map("room_code") @db.VarChar(6)
+  status          String       @db.VarChar(16)
+  startedAt       DateTime     @map("started_at") @db.Timestamptz(3)
+  finishedAt      DateTime     @map("finished_at") @db.Timestamptz(3)
+  durationSeconds Int          @map("duration_seconds")
+  totalMoves      Int          @map("total_moves")
+  winnerId        String?      @map("winner_id") @db.Uuid
+  winner          Player?      @relation("GameWinner", fields: [winnerId], references: [id])
+  participants    GamePlayer[]
+
+  @@index([finishedAt])
+  @@map("games")
+}
+
+/// Participação de um jogador em uma partida e os pontos que ela rendeu.
+model GamePlayer {
+  id            String @id @db.Uuid
+  gameId        String @map("game_id") @db.Uuid
+  playerId      String @map("player_id") @db.Uuid
+  turnOrder     Int    @map("turn_order") @db.SmallInt
+  finalPosition Int    @map("final_position") @db.SmallInt
+  result        String @db.VarChar(16)
+  points        Int
+  game          Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  player        Player @relation(fields: [playerId], references: [id])
+
+  @@unique([gameId, playerId])
+  @@index([playerId])
+  @@map("game_players")
+}

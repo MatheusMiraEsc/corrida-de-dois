@@ -1,0 +1,19 @@
+# Segredos locais
+.env
+.env.local
+
+# Dependências e builds
+node_modules/
+dist/
+target/
+coverage/
+
+# IDE / sistema
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Arquivos pessoais que não pertencem ao projeto
+*.pdf
